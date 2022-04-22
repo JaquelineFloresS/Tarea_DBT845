@@ -1,0 +1,377 @@
+---
+title: "Exploratory data analysis Informantes productivos LYL2"
+author: "José Gallardo Matus"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+# Removemos objetos de la memoria
+
+```{r,echo=F,warning=F,include=F}
+rm(list=ls())
+```
+
+# Instalamos paquetes
+```{r,echo=F,message=F,warning=F}
+#library(rattle)
+library(MASS)
+library(readxl)
+library(magrittr)
+library(corrplot)
+library(mice)
+library(naniar)
+library(tidyverse)
+library(gridExtra)
+```
+
+# Cargamos datos para cada clase año
+
+```{r, echo=F,warning=F,include=F}
+# Código para importar datos a R
+# readxl algunas veces lee columnas con datos vacios como logicas en vez de numerica.
+# https://readxl.tidyverse.org/articles/cell-and-column-types.html
+
+nms <- names(read_excel("~/Dropbox/DATA/PMG/BD/GEN/LYL2YC07_10_13_16_19/DAT_YC/LYL2E7YC19_informantes.xlsx"))
+nms
+ct <- ifelse(grepl("^%", nms), "numeric", "guess")
+ct <- c( "text","text","text","text","date","text","text","text","text","text","text","date","numeric","numeric","numeric","numeric","numeric","numeric","numeric","text","date","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","text","numeric","numeric","numeric","text","text","text","text","text","text","text","text","text","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric")
+
+LYL2E7YC07Informantes <-
+    read_xls("~/Dropbox/DATA/PMG/BD/GEN/LYL2YC07_10_13_16_19/DAT_YC/LYL2E7YC07_Informantes.xls",
+             sheet = 1,
+             col_names = T,
+             col_types = ct,
+             na = "NA")
+
+
+LYL2E7YC10Informantes <-
+    read_xls("~/Dropbox/DATA/PMG/BD/GEN/LYL2YC07_10_13_16_19/DAT_YC/LYL2E7YC10_Informantes.xls",
+             sheet = 1,
+             col_names = T,
+             col_types = ct,
+             na = "NA")
+
+LYL2E7YC13Informantes <-
+    read_xls("~/Dropbox/DATA/PMG/BD/GEN/LYL2YC07_10_13_16_19/DAT_YC/LYL2E7YC13_Informantes.xls",
+             sheet = 1,
+             col_names = T,
+             col_types = ct,
+             na = "NA")
+
+LYL2E7YC16Informantes <-
+    read_xlsx("~/Dropbox/DATA/PMG/BD/GEN/LYL2YC07_10_13_16_19/DAT_YC/LYL2E7YC16_Informantes.xlsx",
+             sheet = 1,
+             col_names = T,
+             col_types = ct,
+             na = "NA")
+
+LYL2E7YC19Informantes <-
+    read_xlsx("~/Dropbox/DATA/PMG/BD/GEN/LYL2YC07_10_13_16_19/DAT_YC/LYL2E7YC19_Informantes.xlsx",
+             sheet = 1,
+             col_names = T,
+             col_types = ct,
+             na = "NA")
+
+```
+
+
+```{r, echo = F,message=F, warning=F, include=F}
+# Explora dimensiones
+
+dim(LYL2E7YC07Informantes);
+dim(LYL2E7YC10Informantes);
+dim(LYL2E7YC13Informantes);
+dim(LYL2E7YC16Informantes);
+dim(LYL2E7YC19Informantes);
+
+# Ediciones en la dimensiones
+
+n07 <- dim(LYL2E7YC07Informantes)[1]
+n10 <- dim(LYL2E7YC10Informantes)[1]
+n13 <- dim(LYL2E7YC13Informantes)[1]
+n16 <- dim(LYL2E7YC16Informantes)[1]
+n19 <- dim(LYL2E7YC19Informantes)[1]
+
+
+# Ordenamos según nombre de columnas
+
+LYL2E7YC07Informantes <-
+    LYL2E7YC07Informantes[,sort(names(LYL2E7YC07Informantes))]
+
+
+LYL2E7YC10Informantes <-
+    LYL2E7YC10Informantes[,sort(names(LYL2E7YC10Informantes))]
+
+
+LYL2E7YC13Informantes <-
+    LYL2E7YC13Informantes[,sort(names(LYL2E7YC13Informantes))]
+
+
+LYL2E7YC16Informantes <-
+    LYL2E7YC16Informantes[,sort(names(LYL2E7YC16Informantes))]
+
+
+LYL2E7YC19Informantes <-
+    LYL2E7YC19Informantes[,sort(names(LYL2E7YC19Informantes))]
+
+# Resultado de las ediciones 
+# mismo número de columnas ordenadas para exploratorio
+
+# names(LYL2E7YC17Informantes) <- names(LYL2E7YC14Informantes)
+
+print(
+ cbind(
+   names(LYL2E7YC07Informantes),
+   names(LYL2E7YC10Informantes),
+   names(LYL2E7YC13Informantes),
+   names(LYL2E7YC16Informantes),
+   names(LYL2E7YC19Informantes)))
+
+print(
+ cbind(
+   str(LYL2E7YC07Informantes),
+   str(LYL2E7YC10Informantes),
+   str(LYL2E7YC13Informantes),
+   str(LYL2E7YC16Informantes),
+   str(LYL2E7YC19Informantes)))
+
+
+
+```
+
+# Matriz final para exploratorio de Informantes Productivos
+
+```{r}
+LYL2E7 <- rbind(LYL2E7YC07Informantes,
+                LYL2E7YC10Informantes,
+                LYL2E7YC13Informantes,
+                LYL2E7YC16Informantes,
+                LYL2E7YC19Informantes)
+```
+
+# Cálculo de variables derivadas
+
+```{r, echo = F,message=F, warning=F, include=F}
+
+LYL2E7$DGR_HARVEST <- (LYL2E7$`PESO WFE` - LYL2E7$`PESO SIEMBRA`) / as.numeric((difftime(LYL2E7$`FECHA COSECHA`, LYL2E7$`FECHA SIEMBRA`,units = "days")))
+
+LYL2E7$SGR_HARVEST <- 100*(log(LYL2E7$`PESO WFE`) - log(LYL2E7$`PESO SIEMBRA`)) / as.numeric((difftime(LYL2E7$`FECHA COSECHA`, LYL2E7$`FECHA SIEMBRA`,units = "days")))
+
+
+LYL2E7$TIME_HARVEST <- 30*as.numeric((difftime(LYL2E7$`FECHA COSECHA`, LYL2E7$`FECHA SIEMBRA`,units = "days")))
+
+
+LYL2E7$TIME_TO_HARVEST_IN5600GR <- (5600/LYL2E7$DGR_HARVEST)/(30)
+
+LYL2E7$YEAR_PIT <- paste0(LYL2E7$`CLASE AÑO`,LYL2E7$PIT)
+
+LYL2E7$YEAR_JAULA <- paste0(LYL2E7$`CLASE AÑO`,"_",LYL2E7$`JAULA ORIGEN`)
+
+```
+
+# Resumen y transformación de los datos
+
+```{r}
+dim(LYL2E7)
+LYL2E7$CENTRO <-as.factor(LYL2E7$CENTRO)
+LYL2E7$`JAULA ORIGEN` <-as.factor(LYL2E7$`JAULA ORIGEN`)
+LYL2E7$`SRS Externo` <-as.factor(LYL2E7$`SRS Externo`)
+LYL2E7$`SRS interno` <-as.factor(LYL2E7$`SRS interno`)
+LYL2E7$`SRS CT` <-as.numeric(LYL2E7$`SRS CT`)
+LYL2E7$`Mortalidad SRS` <-as.factor(LYL2E7$`Mortalidad SRS`)
+LYL2E7$SEXO <-as.factor(LYL2E7$SEXO)
+summary(LYL2E7)
+```
+ 
+# Balance de los datos y variables cualitativas.
+```{r}
+table(LYL2E7$CENTRO, LYL2E7$`CLASE AÑO`)
+
+table(LYL2E7$SEXO, LYL2E7$YEAR_JAULA)
+
+table(LYL2E7$SEXO, LYL2E7$`CLASE AÑO`)
+
+table(LYL2E7$SEXO, LYL2E7$`MADUREZ BINARIO`)
+
+table(LYL2E7$SEXO, LYL2E7$`Mortalidad SRS`)
+
+table(LYL2E7$SEXO, LYL2E7$`Nivel SRS`)
+
+table(LYL2E7$`SRS`, LYL2E7$`Nivel SRS`)
+
+table(LYL2E7$SEXO, LYL2E7$`SRS` )
+ 
+
+# table(LYL2E7$`CLASE AÑO`, LYL2E7$FAMILIA)
+```
+
+ 
+# Variables cuantitativas
+
+## Exploratorio y datos perdidos
+
+```{r, echo = F,message=F, warning=F, include=F}
+qt <- LYL2E7[,which(unlist(lapply(LYL2E7, is.numeric)))]
+qt$"CLASE AÑO" <- as.numeric(LYL2E7$`CLASE AÑO`)
+qt <- qt[,sort(names(qt))]
+```
+
+
+```{r, echo=F, message= F, warning=F}
+
+qt1 <- qt %>% select("% CABEZA":"CATARATAS" )
+par(cex=0.5)
+vis_miss(qt1, sort_miss = T, warn_large_data=F) # exploración de datos perdidos, variable a variable, de variables cuantitativas
+
+qt2 <- qt %>% select("COLOR (20-34) SALMOFAN":"GAPING PMG" )
+par(cex=0.5)
+vis_miss(qt2, sort_miss = T, warn_large_data=F) # exploración de datos perdidos, variable a variable, de variables cuantitativas
+
+qt3 <- qt %>% select("GF3":"numLesMel" )
+par(cex=0.5)
+vis_miss(qt3, sort_miss = T, warn_large_data=F) # exploración de datos perdidos, variable a variable, de variables cuantitativas
+
+qt4 <- qt %>% select("PESO CABEZA":"UTA" )
+par(cex=0.5)
+vis_miss(qt4, sort_miss = T, warn_large_data=F) # exploración de datos perdidos, variable a variable, de variables cuantitativas
+```
+
+
+## Correlaciones
+
+```{r, echo = F,message=F, warning=F}
+corqt1 <- cor(qt1,use = "pairwise.complete.obs")
+par(cex = 0.4)
+corrplot(corqt1, method = "ellipse",type = "upper",is.corr = T)
+
+corqt2 <- cor(qt2,use = "pairwise.complete.obs")
+par(cex = 0.4)
+corrplot(corqt2, method = "ellipse",type = "upper",is.corr = T)
+
+corqt3 <- cor(qt3,use = "pairwise.complete.obs")
+par(cex = 0.4)
+corrplot(corqt3, method = "ellipse",type = "upper",is.corr = T)
+
+corqt4 <- cor(qt4,use = "pairwise.complete.obs")
+par(cex = 0.4)
+corrplot(corqt4, method = "ellipse",type = "upper",is.corr = T)
+
+```
+
+## Gráficas
+
+### CRECIMIENTO 
+
+```{r, message=FALSE}
+vars <- c("PESO CABEZA", "PESO DHON", "PESO FILETE TRIM D", "PESO GÓNADA", "PESO HG" ,"PESO SIEMBRA" , "PESO VISCERAS", "PESO VIVO" , "PESO WFE", "GF3", "SGR_HARVEST")
+
+LYL2E72 <- LYL2E7 %>% filter(!is.na(SEXO))
+
+for(v in vars){
+  p <-
+    ggplot(data = LYL2E72, aes(x = .data[[v]], color=SEXO)) +
+    geom_density() +
+    labs(x = paste(v), title = paste(v))
+  q <-
+    ggplot(data = LYL2E72, aes(x =`CLASE AÑO`, y= .data[[v]], fill=`CLASE AÑO`)) +
+    geom_boxplot() +
+    labs(title = paste(v))
+  grid.arrange(p, q,
+          ncol = 2, nrow = 1 )
+}
+
+```
+
+# RENDIMIENTO
+
+```{r, message=FALSE}
+vars <- c("RENDIMIENTO DHON", "RENDIMIENTO FILETE TRIM D", "RENDIMIENTO HG")
+
+LYL2E72 <- LYL2E7 %>% filter(!is.na(SEXO))
+
+for(v in vars){
+  p <-
+    ggplot(data = LYL2E72, aes(x = .data[[v]], color=SEXO)) +
+    geom_density() +
+    labs(x = paste(v), title = paste(v))
+  q <-
+    ggplot(data = LYL2E72, aes(x =`CLASE AÑO`, y= .data[[v]], fill=`CLASE AÑO`)) +
+    geom_boxplot() +
+    labs(title = paste(v))
+  grid.arrange(p, q,
+          ncol = 2, nrow = 1 )
+}
+```
+
+
+# COLOR
+
+```{r, message=FALSE, warning=FALSE}
+vars <- c("COLOR BELLY (IMAGEN)", "COLOR FILETE (IMAGEN)", "COLOR LOMO (IMAGEN)", "COLOR NQC (IMAGEN)")
+
+LYL2E72 <- LYL2E7 %>% filter(!is.na(SEXO))
+
+for(v in vars){
+  p <-
+    ggplot(data = LYL2E72, aes(x = .data[[v]], color=SEXO)) +
+    geom_density() +
+    labs(x = paste(v), title = paste(v))
+  q <-
+    ggplot(data = LYL2E72, aes(x =`CLASE AÑO`, y= .data[[v]], fill=`CLASE AÑO`)) +
+    geom_boxplot() +
+    labs(title = paste(v))
+  grid.arrange(p, q,
+          ncol = 2, nrow = 1 )
+}
+```
+
+# RESISTENCIA
+
+```{r, message=FALSE, warning=FALSE}
+vars <- c("SRS CT")
+
+LYL2E72 <- LYL2E7 %>% filter(!is.na(`Mortalidad SRS`))
+
+for(v in vars){
+  p <-
+    ggplot(data = LYL2E72, aes(x = .data[[v]], color=SEXO, na.rm = TRUE)) +
+    geom_density() +
+    labs(x = paste(v), title = paste(v))
+  q <-
+    ggplot(data = LYL2E72, aes(x =`CLASE AÑO`, y= .data[[v]], fill=`CLASE AÑO`, na.rm = TRUE)) +
+    geom_boxplot() +
+    labs(title = paste(v))
+  grid.arrange(p, q,
+          ncol = 2, nrow = 1 )
+}
+
+```
+
+
+### RASGOS SELECCIÓN
+
+```{r, message=FALSE}
+vars <- c("PESO WFE", "GF3", "SGR_HARVEST", "COLOR FILETE (IMAGEN)","RENDIMIENTO HG","RENDIMIENTO FILETE TRIM D", "SRS CT")
+
+LYL2E72 <- LYL2E7 %>% filter(!is.na(SEXO))
+
+
+for(v in vars){
+  p <-
+    ggplot(data = LYL2E72, aes(x = .data[[v]], color=SEXO, na.rm = TRUE)) +
+    geom_density() +
+    labs(x = paste(v), title = paste(v))
+  q <-
+    ggplot(data = LYL2E72, aes(x =`CLASE AÑO`, y= .data[[v]], fill=`CLASE AÑO`, na.rm = TRUE)) +
+    geom_boxplot() +
+    labs(title = paste(v))
+  grid.arrange(p, q,
+          ncol = 2, nrow = 1 )
+}
+
+LYL2E72 %>% select("YEAR_PIT", "YEAR_JAULA", "PIT", `PIT PADRE`, `PIT MADRE`, "SEXO", "CENTRO", "CLASE AÑO", "PESO SIEMBRA", "PESO WFE", "SGR_HARVEST", "GF3", "COLOR BELLY (IMAGEN)", "MADUREZ BINARIO", "SRS CT", `Mortalidad SRS`, `Nivel SRS`, `SRS`, "SRS Externo",  "SRS interno") %>% write.csv(file = "LYL2G4.csv", row.names = FALSE) 
+
+
+```
+
+
