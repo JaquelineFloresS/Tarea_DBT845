@@ -1,0 +1,488 @@
+---
+title: "1 LYL3 Padres"
+author: "Espín Rojas, Lenin Patricio"
+date: ""
+output: html_document
+---
+```{r,echo=F,warning=F}
+rm(list=ls())
+```
+
+```{r,echo=F,message=F, warning=F}
+library(MASS)
+library(readxl)
+library(magrittr)
+library(corrplot)
+library(mice)
+library(naniar)
+```
+
+```{r, echo=F, message=F, warning=F, include=F}
+system.time(
+  LYL3E1YC08 <-
+    read_xlsx("C:/Users/yo/Dropbox/LYL3/1 Padres/LYL3E1YC08 Padres.xlsx",
+             sheet = 1,
+             col_names = T,
+             col_types = NULL))
+
+system.time(
+  LYL3E1YC11 <-
+    read_xlsx("C:/Users/yo/Dropbox/LYL3/1 Padres/LYL3E1YC11 Padres.xlsx",
+             sheet = 1,
+             col_names = T,
+             col_types = NULL))
+
+system.time(
+  LYL3E1YC14 <-
+    read_xls("C:/Users/yo/Dropbox/LYL3/1 Padres/LYL3E1YC14 Padres.xls",
+             sheet = 1,
+             col_names = T,
+             col_types = NULL))
+system.time(
+LYL3E1YC17 <-
+  read_xlsx("C:/Users/yo/Dropbox/LYL3/1 Padres/LYL3E1YC17 Padres.xlsx",
+           sheet = 1,
+             col_names = T,
+             col_types = NULL))
+```
+
+```{r, echo = F, message=F, warning=F, include=F}
+dim(LYL3E1YC08);
+dim(LYL3E1YC11);
+dim(LYL3E1YC14);
+dim(LYL3E1YC17) # No hay problemas en el número de variables
+```
+
+```{r, echo=F, message=F, warning=F, include=F}
+system.time(
+  LYL3E1YC08 <-
+    LYL3E1YC08[,sort(names(LYL3E1YC08))])
+
+system.time(
+  LYL3E1YC11 <-
+    LYL3E1YC11[,sort(names(LYL3E1YC11))])
+
+system.time(
+  LYL3E1YC14 <-
+    LYL3E1YC14[,sort(names(LYL3E1YC14))])
+
+system.time(
+  LYL3E1YC17 <-
+    LYL3E1YC17[,sort(names(LYL3E1YC17))])
+
+#View(
+#  cbind(
+#    names(LYL3E1YC08),
+#    names(LYL3E1YC11),
+#    names(LYL3E1YC14),
+#   names(LYL3E1YC17)))
+# no hay problemas en la integridad de los datos
+```
+
+```{r, echo=F, message=F, warning=F, include=F}
+# Matriz final para exploratorio de Informantes Productivos
+system.time(
+LYL3E1 <- rbind(LYL3E1YC08,
+                LYL3E1YC11,
+                LYL3E1YC14,
+                LYL3E1YC17))
+#system.time(write.table(LYL3E1,"C:/Users/yo/Dropbox/LYL3/BDLYL3/LYL3E01 Padres.txt",sep = " ", dec = "."))
+dim(LYL3E1)
+```
+
+# Resumen de los datos
+
+```{r, echo = F}
+summary(LYL3E1)
+```
+
+# Variables cuantitativas
+
+## Exploratorio datos perdidos
+
+```{r, echo=F, message=F, warning=F, include=F}
+qt <- LYL3E1[,which(unlist(lapply(LYL3E1, is.numeric)))] 
+```
+
+```{r, echo = F, message=F, warning=F,fig.width=12}
+par(cex=0.5)
+vis_miss(qt,sort_miss = T) # exploración de datos perdidos, variable a variable, de variables cuantitativas
+```
+
+## Correlaciones
+
+```{r, echo = F, message=F, warning=F, include=F}
+corqt <- cor(qt, use = "pairwise.complete.obs") # matriz de correlaciones
+```
+
+```{r, echo = F, message=F, warning=F}
+par(cex= 0.5)
+corrplot(corqt, method =  "ellipse", type = "upper") # gráfica matriz de correlac  iones
+```
+
+## Gráficas
+
+### SIRE N DAM MEAN WEIGHT
+
+```{r, echo = F}
+m <- qt[c("PESO PROMEDIO PADRES", "CLASE AÑO")]
+u <- "SIRE N DAM MEAN WEIGHT"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1]
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$`PESO PROMEDIO PADRES`
+
+### 
+
+g08 <- density(na.omit(t[h08]))
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+g17 <- density(na.omit(t[h17]))
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g08$y,g11$y,g14$y,g17$y)
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g08, xlab = u, xlim = c(lmin, lmax), ylim = c(0, jmax), main = "")
+lines(g11, lty=2, col = 2)
+lines(g14, lty=3, col = 3)
+lines(g17, lty = 4, col = 4)
+legend("topright", legend = h[-4],col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$`PESO PROMEDIO PADRES` ~ qt$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
+
+### DAM WEIGHT
+
+```{r, echo = F}
+m <- qt[c("PESO MADRE", "CLASE AÑO")]
+u <- "DAM WEIGHT"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1] # no hay datos para 2008
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$`PESO MADRE`
+  
+### 
+
+# g08 <- density(na.omit(t[h08])) #Porcentaje NAs alto
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+g17 <- density(na.omit(t[h17]))
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g11$y,g14$y,g17$y)
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g11, xlab = u, xlim = c(lmin, lmax), ylim = c(0,jmax), main = "")
+lines(g14, lty=2, col = 2)
+lines(g17, lty=3, col = 3)
+legend("topright", legend = h[-1], col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$`PESO MADRE` ~ m$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
+
+### SIRE WEIGHT
+
+```{r, echo = F}
+m <- qt[c("PESO PADRE", "CLASE AÑO")]
+u <- "SIRE WEIGHT"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1] # no hay datos para 2008
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$`PESO PADRE`
+  
+### 
+
+#g08 <- density(na.omit(t[h08])) # Porcentaje de NAs alto
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+g17 <- density(na.omit(t[h17]))
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g11$y,g14$y,g17$y)
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g11, xlab = u, xlim = c(lmin, lmax), ylim = c(0,jmax), main = "")
+lines(g14, lty=2, col = 2)
+lines(g17, lty=3, col = 3)
+legend("topright", legend = h[-1], col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$`PESO PADRE` ~ m$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
+
+### OVA WEIGHT
+
+```{r, echo = F}
+m <- qt[c("PESO OVAS", "CLASE AÑO")]
+u <- "OVA WEIGHT"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1]
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$`PESO OVAS`
+
+### 
+
+#g08 <- density(na.omit(t[h08])) # Porcentaje de NAs alto
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+g17 <- density(na.omit(t[h17]))
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g11$y,g14$y,g17$y)
+
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g11, xlab = u, xlim = c(lmin, lmax), ylim = c(0, jmax), main = "")
+lines(g14, lty=2, col = 2)
+lines(g17, lty=3, col = 3)
+legend("topright", legend = h,col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$`PESO OVAS` ~ qt$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
+
+### OVA SIZE
+
+```{r, echo = F}
+m <- qt[c("TAMAÑO OVA", "CLASE AÑO")]
+u <- "SIZE OVA"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1] # no hay datos para 2008
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$`TAMAÑO OVA`
+  
+### 
+
+g08 <- density(na.omit(t[h08]))
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+g17 <- density(na.omit(t[h17]))
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g08$y,g11$y,g14$y,g17$y)
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g08, xlab = u, xlim = c(lmin, lmax), ylim = c(0,jmax), main = "")
+lines(g11, lty=2, col = 2)
+lines(g14, lty=3, col = 3)
+lines(g17, lty=4, col = 4)
+legend("topright", legend = h, col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$`TAMAÑO OVA` ~ m$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
+
+### OVA VOLUME
+
+```{r, echo = F}
+m <- qt[c("VOLUMEN OVAS", "CLASE AÑO")]
+u <- "OVA VOLUME"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1] # no hay datos para 2008
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$`VOLUMEN OVAS`
+  
+### 
+
+g08 <- density(na.omit(t[h08]))
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+#g17 <- density(na.omit(t[h17])) # Porcentaje de NAs alto
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g08$y,g11$y,g14$y)
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g08, xlab = u, xlim = c(lmin, lmax), ylim = c(0,jmax), main = "")
+lines(g11, lty=2, col = 2)
+lines(g14, lty=3, col = 3)
+legend("topright", legend = h[-4], col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$`VOLUMEN OVAS` ~ m$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
+
+### DEAD OVA
+
+```{r, echo = F}
+m <- qt[c("OVAS MUERTAS", "CLASE AÑO")]
+u <- "DEAD OVA"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1] # no hay datos para 2008
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$`OVAS MUERTAS`
+  
+### 
+
+#g08 <- density(na.omit(t[h08])) #Porcentaje de NAs alto
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+g17 <- density(na.omit(t[h17]))
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g11$y,g14$y,g17$y)
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g11, xlab = u, xlim = c(lmin, lmax), ylim = c(0,jmax), main = "")
+lines(g14, lty=2, col = 2)
+lines(g17, lty=3, col = 3)
+legend("topright", legend = h[-1], col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$`OVAS MUERTAS` ~ m$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
+
+### PMG OVAS
+
+```{r, echo = F}
+m <- qt[c("OVAS PMG", "CLASE AÑO")]
+u <- "PMG OVAS"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1] # no hay datos para 2008
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$`OVAS PMG`
+  
+### 
+
+g08 <- density(na.omit(t[h08]))
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+g17 <- density(na.omit(t[h17]))
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g08$y,g11$y,g14$y,g17$y)
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g08, xlab = u, xlim = c(lmin, lmax), ylim = c(0,jmax), main = "")
+lines(g11, lty=2, col = 2)
+lines(g14, lty=3, col = 3)
+lines(g17, lty=4, col = 4)
+legend("topright", legend = h, col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$`OVAS PMG` ~ m$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
+
+### PRODUCTION OVA
+
+```{r, echo = F}
+m <- qt[c("OVAS PRODUCCIÓN", "CLASE AÑO")]
+u <- "PRODUCTION OVA"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1] # no hay datos para 2008
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$`OVAS PRODUCCIÓN`
+  
+### 
+
+g08 <- density(na.omit(t[h08]))
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+g17 <- density(na.omit(t[h17]))
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g08$y,g11$y,g14$y,g17$y)
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g08, xlab = u, xlim = c(lmin, lmax), ylim = c(0,jmax), main = "")
+lines(g11, lty=2, col = 2)
+lines(g14, lty=3, col = 3)
+lines(g17, lty=4, col = 4)
+legend("topright", legend = h, col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$`OVAS PRODUCCIÓN` ~ m$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
+
+### FERTILITY
+
+```{r, echo = F}
+m <- qt[c("FERTILIDAD", "CLASE AÑO")]
+u <- "FERTILITY"
+w <- "YEAR CLASS"
+
+h <- levels(as.factor(qt$`CLASE AÑO`))
+h08 <- qt$`CLASE AÑO` == h[1] # no hay datos para 2008
+h11 <- qt$`CLASE AÑO` == h[2]
+h14 <- qt$`CLASE AÑO` == h[3]
+h17 <- qt$`CLASE AÑO` == h[4]
+
+t <- m$FERTILIDAD
+  
+### 
+
+#g08 <- density(na.omit(t[h08])) #Porcentaje NAs alto
+g11 <- density(na.omit(t[h11]))
+g14 <- density(na.omit(t[h14]))
+g17 <- density(na.omit(t[h17]))
+
+lmin <- min(na.omit(t))
+lmax <- max(na.omit(t))
+jmax <- max(g11$y,g14$y,g17$y)
+
+par(mfrow=c(2,1), cex = 0.5)
+plot(g11, xlab = u, xlim = c(lmin, lmax), ylim = c(0,jmax), main = "")
+lines(g14, lty=2, col = 2)
+lines(g17, lty=3, col = 3)
+legend("topright", legend = h[-1], col = c(1:length(h)), lty = c(1:length(h)), bty = "n")
+
+boxplot(m$FERTILIDAD ~ m$`CLASE AÑO`,
+        xlab = w, ylab = u)
+```
