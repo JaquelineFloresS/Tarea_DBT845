@@ -1,8 +1,8 @@
 ## Título  
-Análisis de genotipos de familias de _Salmo salar_
+**Análisis de genotipos de familias de _Salmo salar_**
 
 ## Autor 
-Jaqueline Flores Salinas
+**Jaqueline Flores Salinas**
 
 ## Problema a resolver
 
