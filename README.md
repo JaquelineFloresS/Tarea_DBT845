@@ -18,6 +18,8 @@ Cómo sé cuales son los maduros de los que aparecen en el excel??
 ## Problema a resolver
 La base de datos empleada en la
 
+Mencionar origen de los datos
+
 ## Detalles de la base de datos
 
 ### Variables de estudio
