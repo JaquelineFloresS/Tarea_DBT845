@@ -1,5 +1,5 @@
 # Título  
-## **Análisis del crecimiento y maduración temprana en familias de _Salmo salar_ variedad Fanad**
+### **Análisis del crecimiento y maduración temprana en familias de _Salmo salar_ variedad Fanad**
 
 # Autor 
 ### **Jaqueline Flores Salinas**
