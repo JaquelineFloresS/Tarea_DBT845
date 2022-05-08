@@ -11,6 +11,6 @@ En Chile, una de las especies de mayor importancia económica y alimenticia es e
 La base de datos contiene datos de familias de la variedad Fanad de _Salmo salar_, mismas que forman parte de un Programa de Mejor Genética (PMG) de una compañía pesquera en Chile.
 
 ## Variables de estudio, factores que se desean analizar y número total de observaciones
-Variable respuesta: Maduración temprana  
+Variable respuesta: Crecimiento y maduración temprana  
 Factores a analizar: 
 Observaciones:
