@@ -14,5 +14,7 @@ La base de datos contiene datos de familias de la variedad Fanad de _Salmo salar
 **Variable respuesta:**  
 - Crecimiento (dado por el peso de los individuos: cuantitativa continua)  
 - Maduración temprana (estado maduro temprano o no: aleatoria discreta)  
+
 **Factores a analizar:** Peso de los individuos, fecundiad, fertilidad, datos sobre calidad de las ovas (volumne, peso, muertas, supervivencia)  
+
 **Observaciones:** 90 (2010), 117 (2013), 290 (2016) y 181 (2019).
