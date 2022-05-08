@@ -1,5 +1,5 @@
 # Título  
-### **Análisis de datos de un Programa de Mejora Genética para el control de la maduración temprana en familias de _Salmo salar_ variedad Fanad**
+### **Análisis de datos de un Programa de Mejora Genética para el control de la maduración temprana, en familias de _Salmo salar_ variedad Fanad**
 
 # Autor 
 ### **Jaqueline Flores Salinas**
