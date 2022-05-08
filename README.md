@@ -3,15 +3,6 @@
 
 Debe ir respecto de la variable respuesta, esta variable es la maduración temprana.
 
-
-PREGUNTAS:
-En limpieza de exceles:
-Columnas extra, las dejo? es decir, las agrego en los otros dos exceles o las quito en los que las tienen?
-Hay comentarios de viabilidad, los dejo o quito la columna?
-
-Cómo sé cuales son los maduros de los que aparecen en el excel??
-
-
 ## Autor 
 **Jaqueline Flores Salinas**
 
