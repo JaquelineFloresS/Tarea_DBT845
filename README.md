@@ -15,7 +15,7 @@ La base de datos contiene información de familias de la variedad Fanad de _Salm
 Maduración temprana: estado maduro temprano o no maduro temprano, es por ende una variable aleatoria discreta.  
 
 **Factores a analizar:**  
-Cuantitativas continuas: Peso de los individuos, fecundiad, fertilidad, datos sobre calidad de las ovas (volumne, peso, muertas, supervivencia).    
+Cuantitativas continuas: Peso de los individuos, fecundiad, fertilidad, datos sobre calidad de las ovas (volumen, peso, muertas, supervivencia).    
 Aleatoria discreta: Fotoperiodo.   
 
 **Observaciones:** 90 (2010), 117 (2013), 290 (2016) y 181 (2019).
