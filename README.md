@@ -16,6 +16,5 @@ Maduración temprana: estado maduro temprano o no maduro temprano, es por ende u
 
 **Factores a analizar:**  
 Cuantitativas continuas: Peso de los individuos, fecundiad, fertilidad, datos sobre calidad de las ovas (volumen, peso, muertas, supervivencia).    
-Aleatoria discreta: Fotoperiodo.   
 
 **Observaciones:** 90 (2010), 117 (2013), 290 (2016) y 181 (2019).
