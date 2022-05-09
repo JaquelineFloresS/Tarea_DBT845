@@ -1,30 +1,140 @@
 ---
-title: "Exploratorio"
-author: "Jaqueline Flores Salinas"
-date: "19/4/2022"
-output: html_document
+title: "Análisis Exploratorio de Datos (EDA)"
+author: 'Elaborado por: Jaqueline Flores Salinas'
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
-```{r setup, include=FALSE}
+# Remover objetos de la memoria.
+Después de trabajar durante un tiempo, el entorno de R puede acumular muchos datos en memoria, reteniendo partes significativas de los recursos del ordenador, por ello este punto es importante realizarlo al inicio de un nuevo trabajo.
+```{r}
 knitr::opts_chunk$set(echo = TRUE)
+rm(list=ls())
 ```
 
-## R Markdown
+# Instalación de paquetes.   
+Aquí procederemos a instalar y cargar los paquetes necesarios para el análisis exploratorio de los datos.
+```{r}
+#install.packages("rattle")
+#install.packages("MASS")
+#install.packages("readxl")
+#install.packages("magrittr")
+#install.packages("corrplot")
+#install.packages("mice")
+#install.packages("naniar")
+#install.packages("tidyverse")
+#install.packages("gridExtra")
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+#library(rattle)
+#library(MASS)
+#library(readxl)
+#library(magrittr)
+#library(mice)
+#library(corrplot)
+#library(naniar)
+#library(gridExtra)
+#library(tidyverse)
+#tinytex::install_tinytex()
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+# Cargar nombres de columnas a analizar.   
+Aquí haremos la importación de la base de datos más actualizada que tengamos, para cargar los nombres de columnas. Con base en las columnas de esta se editaron el resto de los documentos de excel, a mano, para asegurar de que todos tuvieran las mismas columnas.
+```{r}
+nms <- names(readxl::read_excel("C:/Users/jaky_/Documents/GitHub/Tarea_DBT845/Datos/FDL2E1YC19_Padres.xlsx"))
+nms
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Indicar el tipo de datos que contiene cada columna.  
+Aquí se procede a indicar cuales columnas contienen variables de tipo texto, número o fecha.
+```{r}
+ct <- ifelse(grepl("^%", nms), "numeric", "guess")
+ct <- c( "text","text","text","numeric","date","date","numeric","text","text","text","text","numeric","numeric","numeric","text","text","text","text","text","text","text","text","numeric","numeric","numeric","numeric","numeric","numeric","numeric","date","numeric","numeric","numeric","numeric","date","numeric","numeric","numeric","date","numeric","text","text")
+```
+
+# Cargar bases de datos de los años a analizar.   
+Con base en las columnas antes importadas, y en los tipos de variables previamente definidos, se procede a importar o cargar los archivos excel de cada uno de los años a analizar.
+```{r}
+FDL2E1YC10Padres <-
+    readxl::read_xlsx("C:/Users/jaky_/Documents/GitHub/Tarea_DBT845/Datos/FDL2E1YC10_Padres.xlsx",
+             sheet = 1,
+             col_names = T,
+             col_types = ct,
+             na = "NA")
+
+FDL2E1YC13Padres <-
+    readxl::read_xlsx("C:/Users/jaky_/Documents/GitHub/Tarea_DBT845/Datos/FDL2E1YC13_Padres.xlsx",
+             sheet = 1,
+             col_names = T,
+             col_types = ct,
+             na = "NA")
+
+FDL2E1YC16Padres <-
+    readxl::read_xlsx("C:/Users/jaky_/Documents/GitHub/Tarea_DBT845/Datos/FDL2E1YC16_Padres.xlsx",
+             sheet = 1,
+             col_names = T,
+             col_types = ct,
+             na = "NA")
+
+FDL2E1YC19Padres <-
+    readxl::read_xlsx("C:/Users/jaky_/Documents/GitHub/Tarea_DBT845/Datos/FDL2E1YC19_Padres.xlsx",
+             sheet = 1,
+             col_names = T,
+             col_types = ct,
+             na = "NA")
+```
+
+# Explorar las dimensiones de las bases importadas.  
+En este paso procederemos a explorar y corroborar que los 4 archivos cargados contengan las mismas dimensiones respecto del número de columnas, ya que la cantidad de filas u observaciones, es distitna en cada archivo. Esto es una corroboraicón adicional, ya que ya se había realizado una revisión general de forma visual, antes de importar los archivos a R.
+```{r}
+dim(FDL2E1YC10Padres);
+dim(FDL2E1YC13Padres);
+dim(FDL2E1YC16Padres);
+dim(FDL2E1YC19Padres)
+```
+
+# Editar la dimensiones de las bases importadas.  
+Una vez confirmado que las dimensiones o columnas de nuestros archivos, son las mismas, aquí procedemos a fijar la dimensión de los archivos para que contengan 1 sola dimensión.
+```{r}
+n10 <- dim(FDL2E1YC10Padres)[1]
+n13 <- dim(FDL2E1YC13Padres)[1]
+n16 <- dim(FDL2E1YC16Padres)[1]
+n19 <- dim(FDL2E1YC19Padres)[1]
+```
+
+# Ordenar archivos según nombre de columnas.  
+En este paso procederemos a organizar cada archivo para que las columnas se re acomoden en orden alfabético, de acuerdo con el nombre de cada columna, esto con la intención de facilitar la búsqueda de columnas dentro del archivo.
+```{r}
+FDL2E1YC10Padres <-
+    FDL2E1YC10Padres[,sort(names(FDL2E1YC10Padres))]
+
+FDL2E1YC13Padres <-
+    FDL2E1YC13Padres[,sort(names(FDL2E1YC13Padres))]
+
+FDL2E1YC16Padres <-
+    FDL2E1YC16Padres[,sort(names(FDL2E1YC16Padres))]
+
+FDL2E1YC19Padres <-
+    FDL2E1YC19Padres[,sort(names(FDL2E1YC19Padres))]
+```
+
+# Exploración de ajustes.  
+En este paso procederemos a imprimir los datos de los archivos importados, una vez realizados los ajustes anteriores, para corroborar que los comando anteriores se ejecutaron exitosamente y se logró el objetivo deseado en los archivos a evaluar.
+
+En este primer paso verificamos los nombres de las columnas de los 4 archivos, aquí podremos corroborar una vez mas, que los nombres son los mismos debido al comando del primer paso de este script, donde se realizó la importación de los nombres de las columnas de uno de los archivos.
+```{r}
+knitr::knit_print(cbind(names(FDL2E1YC10Padres), names(FDL2E1YC13Padres), names(FDL2E1YC16Padres), names(FDL2E1YC19Padres)))
+```
+
+En este segundo paso imprimimos un resumen de los datos contenidos en cada uno de los 4 archivos a analizar, aquí podemos corroborar el formato de cada columna o variable, así como el número de observaciones para cada archivo.
+```{r}
+knitr::knit_print(cbind(str(FDL2E1YC10Padres), str(FDL2E1YC13Padres), str(FDL2E1YC16Padres), str(FDL2E1YC19Padres)))
+```
+
+# Matriz para el Exploratorio de datos.  
+Una vez confirmando que los nombres y dimensiones de los archivos coinciden, en este paso procederemos a unir los 4 archivos y crear uno solo, a partir del cual se podrá realizar el análisis exploratorio de los datos.
+```{r}
+FDL2E1YC <- rbind(FDL2E1YC10Padres,FDL2E1YC13Padres,FDL2E1YC16Padres,FDL2E1YC19Padres)
+```
+
