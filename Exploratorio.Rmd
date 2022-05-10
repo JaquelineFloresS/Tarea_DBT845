@@ -26,7 +26,8 @@ Aquí procederemos a instalar y cargar los paquetes necesarios para el análisis
 #install.packages("naniar")
 #install.packages("tidyverse")
 #install.packages("gridExtra")
-#install.packages(dplyr)
+#install.packages("dplyr")
+#install.packages("tidyr")
 
 #library(rattle)
 #library(MASS)
@@ -39,6 +40,7 @@ Aquí procederemos a instalar y cargar los paquetes necesarios para el análisis
 #library(tidyverse)
 #tinytex::install_tinytex()
 #library(dplyr)
+#library(tidyr)
 ```
 
 # Cargar nombres de columnas a analizar   
@@ -259,7 +261,7 @@ par(mfrow=c(2,2))
 En este punto procederemos a realizar evaluaciones visuales entre las variables y factores de nuestra base de datos.  
 
 # Peso de los padres VS año de evaluación  
-Podemos ver, respecto del peso de los padres, que existe una menor variabilidad en el peso en el año 2019, esto relacionado con que no se observan datos por fuera de la distribución normal observada. Por otro lado, la media para este año es de alrededor de 5kg. La mayor variabilidad se observa en el año 2010, año que corresponde al inicio del PMG y por ende a la población inicial, lo que causa esa variabilidad entre los datos, donde se perciben valores atípicos como individuos con peso de hasta más de 20kg. Aquí resalta que en el año 2016 la media fue superior a la media observada en 2019, sin embargo el peso máximo para el año 2016 no supero los 7kg, pero en 2019 se observa una máxima de 8-8.5kg. Esto es un indicio de que el Programa de Mejora Genética ha permitido incrementar el peso promedio de los padres.
+A partir del gráfico y las tablas de resumen presentadas a continuación para la variable de peso de los padres, podemos ver que para el año 2019 no se observan valores o datos atípicos como se sucede en los años anteriores. Siendo que la mayor variabilidad se observa en el año 2010, año que corresponde al inicio del PMG y por ende a la población inicial, lo que puede ser la causa de esa variabilidad entre los datos, donde se perciben valores atípicos como individuos con peso de hasta más de 20kg. Aquí resalta que en el año 2016 la media fue 400gr superior a la media observada en 2019, sin embargo el peso máximo para el año 2016 no supero los 7kg, esto sin considerar los datos atípicos que incluyen una minoría de individuos de hasta 15kg, mientras que en 2019 se observa una máxima de 8.4kg, sin incluir o considerar datos atípicos debido a la uniformidad del peso en la población. Esto es un indicio de que el Programa de Mejora Genética ha permitido incrementar el peso promedio de los padres.
 ```{r}
 boxplot(FDL2E1YC$`PESO PADRE`~FDL2E1YC$`CLASE AÑO`, main="Peso padres por año", ylab="Peso (gr)", xlab="Año de evaluación", col="yellowgreen")
 ```
@@ -278,7 +280,6 @@ knitr::kable(PePad10, caption = "Tabla 7. Resumen de peso de los padres año 201
 knitr::kable(PePad13, caption = "Tabla 8. Resumen de peso de los padres año 2013.")
 knitr::kable(PePad16, caption = "Tabla 9. Resumen de peso de los padres año 2016.")
 knitr::kable(PePad19, caption = "Tabla 10. Resumen de peso de los padres año 2019.")
-
 ```
 
 # Peso de las madres VS año de evaluación  
