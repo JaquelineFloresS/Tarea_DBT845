@@ -7,14 +7,14 @@ output:
   html_document: default
 ---
 
-# Remover objetos de la memoria.
+# Remover objetos de la memoria
 Después de trabajar durante un tiempo, el entorno de R puede acumular muchos datos en memoria, reteniendo partes significativas de los recursos del ordenador, por ello este punto es importante realizarlo al inicio de un nuevo trabajo.
 ```{r}
 knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls())
 ```
 
-# Instalación de paquetes.   
+# Instalación de paquetes   
 Aquí procederemos a instalar y cargar los paquetes necesarios para el análisis exploratorio de los datos.
 ```{r}
 #install.packages("rattle")
@@ -26,6 +26,7 @@ Aquí procederemos a instalar y cargar los paquetes necesarios para el análisis
 #install.packages("naniar")
 #install.packages("tidyverse")
 #install.packages("gridExtra")
+#install.packages(dplyr)
 
 #library(rattle)
 #library(MASS)
@@ -37,23 +38,24 @@ Aquí procederemos a instalar y cargar los paquetes necesarios para el análisis
 #library(gridExtra)
 #library(tidyverse)
 #tinytex::install_tinytex()
+#library(dplyr)
 ```
 
-# Cargar nombres de columnas a analizar.   
+# Cargar nombres de columnas a analizar   
 Aquí haremos la importación de la base de datos más actualizada que tengamos, para cargar los nombres de columnas. Con base en las columnas de esta se editaron el resto de los documentos de excel, a mano, para asegurar de que todos tuvieran las mismas columnas.
 ```{r}
 nms <- names(readxl::read_excel("C:/Users/jaky_/Documents/GitHub/Tarea_DBT845/Datos/FDL2E1YC19_Padres.xlsx"))
 nms
 ```
 
-# Indicar el tipo de datos que contiene cada columna.  
+# Indicar el tipo de datos que contiene cada columna  
 Aquí se procede a indicar cuales columnas contienen variables de tipo texto, número o fecha.
 ```{r}
 ct <- ifelse(grepl("^%", nms), "numeric", "guess")
 ct <- c( "text","text","text","numeric","date","date","numeric","text","text","text","text","numeric","numeric","numeric","text","text","text","text","text","text","text","text","numeric","numeric","numeric","numeric","numeric","numeric","numeric","date","numeric","numeric","numeric","numeric","date","numeric","numeric","numeric","date","numeric","text","text")
 ```
 
-# Cargar bases de datos de los años a analizar.   
+# Cargar bases de datos de los años a analizar   
 Con base en las columnas antes importadas, y en los tipos de variables previamente definidos, se procede a importar o cargar los archivos excel de cada uno de los años a analizar.
 ```{r}
 FDL2E1YC10Padres <-
@@ -85,7 +87,7 @@ FDL2E1YC19Padres <-
              na = "NA")
 ```
 
-# Explorar las dimensiones de las bases importadas.  
+# Explorar las dimensiones de las bases importadas  
 En este paso procederemos a explorar y corroborar que los 4 archivos cargados contengan las mismas dimensiones respecto del número de columnas, ya que la cantidad de filas u observaciones, es distitna en cada archivo. Esto es una corroboraicón adicional, ya que ya se había realizado una revisión general de forma visual, antes de importar los archivos a R.
 ```{r}
 dim(FDL2E1YC10Padres);
@@ -94,7 +96,7 @@ dim(FDL2E1YC16Padres);
 dim(FDL2E1YC19Padres)
 ```
 
-# Editar la dimensiones de las bases importadas.  
+# Editar la dimensiones de las bases importadas  
 Una vez confirmado que las dimensiones o columnas de nuestros archivos, son las mismas, aquí procedemos a fijar la dimensión de los archivos para que contengan 1 sola dimensión.
 ```{r}
 n10 <- dim(FDL2E1YC10Padres)[1]
@@ -103,7 +105,7 @@ n16 <- dim(FDL2E1YC16Padres)[1]
 n19 <- dim(FDL2E1YC19Padres)[1]
 ```
 
-# Ordenar archivos según nombre de columnas.  
+# Ordenar archivos según nombre de columnas  
 En este paso procederemos a organizar cada archivo para que las columnas se re acomoden en orden alfabético, de acuerdo con el nombre de cada columna, esto con la intención de facilitar la búsqueda de columnas dentro del archivo.
 ```{r}
 FDL2E1YC10Padres <-
@@ -119,7 +121,7 @@ FDL2E1YC19Padres <-
     FDL2E1YC19Padres[,sort(names(FDL2E1YC19Padres))]
 ```
 
-# Exploración de ajustes.  
+# Exploración de ajustes  
 En este paso procederemos a imprimir los datos de los archivos importados, una vez realizados los ajustes anteriores, para corroborar que los comando anteriores se ejecutaron exitosamente y se logró el objetivo deseado en los archivos a evaluar.
 
 En este primer paso verificamos los nombres de las columnas de los 4 archivos, aquí podremos corroborar una vez mas, que los nombres son los mismos debido al comando del primer paso de este script, donde se realizó la importación de los nombres de las columnas de uno de los archivos.
@@ -132,9 +134,162 @@ En este segundo paso imprimimos un resumen de los datos contenidos en cada uno d
 knitr::knit_print(cbind(str(FDL2E1YC10Padres), str(FDL2E1YC13Padres), str(FDL2E1YC16Padres), str(FDL2E1YC19Padres)))
 ```
 
-# Matriz para el Exploratorio de datos.  
+# Matriz para el Exploratorio de datos  
 Una vez confirmando que los nombres y dimensiones de los archivos coinciden, en este paso procederemos a unir los 4 archivos y crear uno solo, a partir del cual se podrá realizar el análisis exploratorio de los datos.
 ```{r}
 FDL2E1YC <- rbind(FDL2E1YC10Padres,FDL2E1YC13Padres,FDL2E1YC16Padres,FDL2E1YC19Padres)
+summary(FDL2E1YC)
+```
+
+# Transformar los datos
+En este punto transformaremos los datos que así lo requieran. Esto debido a que a pesar de haber identificado en un paso inicial el tipo de dato contenido en cada columna, este tipo de dato puede no ser útil para las mediciones o evaluaciones a realizar posteriormente.
+```{r}
+dim(FDL2E1YC)
+FDL2E1YC$`CATEGORÍA HEMBRA` <-as.factor(FDL2E1YC$`CATEGORÍA HEMBRA`)
+FDL2E1YC$`CATEGORÍA MACHO` <-as.factor(FDL2E1YC$`CATEGORÍA MACHO`)
+FDL2E1YC$`CAUSA INVIABILIDAD` <-as.factor(FDL2E1YC$`CAUSA INVIABILIDAD`)
+FDL2E1YC$`CEPA` <-as.factor(FDL2E1YC$`CEPA`)
+FDL2E1YC$`CLASE AÑO` <-as.factor(FDL2E1YC$`CLASE AÑO`)
+FDL2E1YC$`CÓDIGO DESOVE H` <-as.factor(FDL2E1YC$`CÓDIGO DESOVE H`)
+FDL2E1YC$`CÓDIGO DESOVE M` <-as.factor(FDL2E1YC$`CÓDIGO DESOVE M`)
+FDL2E1YC$`DAÑO OCULAR` <-as.factor(FDL2E1YC$`DAÑO OCULAR`)
+FDL2E1YC$`EDAD HEMBRA` <-as.factor(FDL2E1YC$`EDAD HEMBRA`)
+FDL2E1YC$`EDAD MACHO` <-as.factor(FDL2E1YC$`EDAD MACHO`)
+FDL2E1YC$`ESTADO DE CRUZA` <-as.factor(FDL2E1YC$`ESTADO DE CRUZA`)
+FDL2E1YC$`FAMILIA` <-as.factor(FDL2E1YC$`FAMILIA`)
+FDL2E1YC$`FECHA DESOVE MADRE` <-as.Date(FDL2E1YC$`FECHA DESOVE MADRE`,format="%d/%m/%y")
+FDL2E1YC$`FECHA DESOVE PADRE` <-as.Date(FDL2E1YC$`FECHA DESOVE PADRE`,format="%d/%m/%y")
+FDL2E1YC$`FECHA LIMPIEZA OVAS` <-as.Date(FDL2E1YC$`FECHA LIMPIEZA OVAS`,format="%d/%m/%y")
+FDL2E1YC$`FECHA SIEMBRA OVA` <-as.Date(FDL2E1YC$`FECHA SIEMBRA OVA`,format="%d/%m/%y")
+FDL2E1YC$`FOTOPERÍODO` <-as.factor(FDL2E1YC$`FOTOPERÍODO`)
+FDL2E1YC$`LÍNEA` <-as.factor(FDL2E1YC$`LÍNEA`)
+FDL2E1YC$`FOTOPERÍODO` <-as.factor(FDL2E1YC$`FOTOPERÍODO`)
+FDL2E1YC$`LÍNEA` <-as.factor(FDL2E1YC$`LÍNEA`)
+FDL2E1YC$`N° CRUZA` <-as.factor(FDL2E1YC$`N° CRUZA`)
+FDL2E1YC$`N° SF TRASLADADOS` <-as.factor(FDL2E1YC$`N° SF TRASLADADOS`)
+FDL2E1YC$`OBSERVACIONES` <-as.factor(FDL2E1YC$`OBSERVACIONES`)
+FDL2E1YC$`PIT MADRE` <-as.factor(FDL2E1YC$`PIT MADRE`)
+FDL2E1YC$`PIT PADRE` <-as.factor(FDL2E1YC$`PIT PADRE`)
+summary(FDL2E1YC)
+```
+
+# Revisar balance de datos  
+En los siguientes pasos se obtienen tablas de frecuencia para determinar el estado balanceado, o no, de los datos con los que se cuenta.
+
+En esta primera tabla podemos observar las líneas (PREGUNTAR QUE ES ESTO) empleadas por año, y se determina que respecto de esta variable cualitativa los datos no se encuentran balanceados ya que en 2016 se encuentra 1 observación de la línea 3 (L3), siendo que en el resto de los años esto no se observa, solo se encuentran observaciones de la línea 2 (L2). 
+```{r, fig.cap="**Tabla 1.Líneas de cultivo vs Año de Evaluación**"}
+knitr::kable(table(FDL2E1YC$LÍNEA, FDL2E1YC$`CLASE AÑO`), caption = "Tabla 1. Línea de cultivo empleada en cada año evaluado.")
+```
+
+Esta segunda tabla nos permite ver que hay una amplia variedad en el número de cruzas durante cada uno de los años evaluados, este número de cruzas es igual al número de observaciones por año, por lo que respecto de esta variable, los datos tampoco se encuentran balanceados.
+```{r, fig.cap="**Tabla 2.Número de cruzas realizadas por año de evaluación**"}
+#table(FDL2E1YC$`N° CRUZA`, FDL2E1YC$`CLASE AÑO`)
+```
+
+Esta tercera tabla nos permite ver la edad que tenían las hembras seleccionadas para cruza durante cada uno de los años evaluados. Nuevamente, respecto de esta variable, se observa que únicamente en el año 2013 hay un balance en los datos, ya que se emplearon únicamente hembras de 2 semanas de edad. Sin embargo, en el conjunto de los datos no existe un balance ya que no se emplea el mismo número de hembras de 2 y 3 semanas de edad. 
+```{r, fig.cap="**Tabla 3.Edad de las hembras empleadas para las cruzas vs Año de evaluación**"}
+knitr::kable(table(FDL2E1YC$`EDAD HEMBRA`, FDL2E1YC$`CLASE AÑO`), caption = "Tabla 3. Edad de las hembras en cada año evaluado.")
+```
+
+Esta cuarta tabla, al igual que la anterior, nos permite ver la edad de los machos seleccionados para cruza durante cada uno de los años evaluados. Nuevamente, respecto de esta variable, se observa que únicamente en el año 2013 hay un balance en los datos, ya que se emplearon únicamente hembras de 2 semanas de edad. Sin embargo, en el conjunto de los datos no existe un balance, esto debido a que no se emplea el mismo número de machos de 2 y 3 semanas de edad. Adicionalmente, en los años 2016 y 2019 no existe un balance entre el número de machos y hembras empleados de la misma edad.
+```{r, fig.cap="**Tabla 4.Edad de los machos empleados para las cruzas vs Año de evaluación**"}
+knitr::kable(table(FDL2E1YC$`EDAD MACHO`, FDL2E1YC$`CLASE AÑO`), caption = "Tabla 4. Edad de los machos en cada año evaluado.")
+```
+
+Esta quinta tabla, nos permite observar el número de individuos que fueron, o no, expuestos a fotoperíodo, en cada uno de los años a evaluar. Respecto de esta variable, los datos tampoco se encuentran balanceados. De forma individual solo están balanceados en los años 2010 y 2013, pero en conjunto no se cuenta con datos balanceados respecto de esta variable, ya que no tenemos el mismo número de de individuos expuestos a fotoperíodo en cada uno de los años.
+```{r, fig.cap="**Tabla 5.Individuos expuestos a fotoperíodo por año de evaluación**"}
+knitr::kable(table(FDL2E1YC$`FOTOPERÍODO`, FDL2E1YC$`CLASE AÑO`), caption = "Tabla 5. Individuos expuestos a fotoperíodo en cada año evaluado.")
+```
+
+Esta última tabla nos permite identificar el número de cruzas que fueron viables e inviables por cada uno de los años a evaluar. Podemos percatarnos de que las 4 opciones que aparecen en la tabla representan solo 2 opciones pero escritas de forma distinta, por lo que se detectan como 4. Respecto de esta variable podemos determinar que los datos no se encuentran balanceados, ya que el número de cruzas viables e inviables por año es distinto.
+```{r, fig.cap="**Tabla 6.Número de cruzas viables e inviables por año de evaluación**"}
+knitr::kable(table(FDL2E1YC$`ESTADO DE CRUZA`, FDL2E1YC$`CLASE AÑO`), caption = "Tabla 6. Viabilidad de las cruzas en cada año evaluado.")
+```
+
+# Revisar variables de estudio   
+## Variables relacionadas con los reproductores.  
+Aquí se observa que la mayoría de las hembras o madres tienen un peso por debajo de los 5kg, mientras que la mayoría de los machos o padres tienen un peso entre los 5kg y los 7kg. Siendo que, respecto del promedio del peso de la pareja reproductora, la mayoría se ubican desde los 5kg y por debajo de este valor.
+```{r}
+par(mfrow=c(2,2))
+((hist(FDL2E1YC$`PESO MADRE`,main="PESO MADRE", col = "aquamarine3")))
+((hist(FDL2E1YC$`PESO PADRE`,main="PERO PADRE", col = "aquamarine3")))
+((hist(FDL2E1YC$`PESO PROMEDIO PADRES`,main="PESO PROMEDIO PADRES", col = "aquamarine3")))
+```
+
+## Variables relacionadas con la reproducción.  
+La fecundidad total de los reproductores, medida respecto del número de ovas obtenidas, se encuentra en su mayoría entre 5-10mil ovas. Mientras que la fecundidad relativa, medida como el número de ovas sobre el peso de las mismas, se encuentra entre las 2mil ovas. Vemos además que las cruzas o parejas reproductoras presentan un porcentaje de fertilidad superior al 60%, dónde la mayoría de las parejas presenta entre un 90-100% de fertilidad. 
+```{r}
+par(mfrow=c(2,2))
+((hist(FDL2E1YC$`FECUNDIDAD TOTAL`,main="FECUNDIDAD TOTAL", col = "coral")))
+((hist(FDL2E1YC$`FECUNDIDAD RELATIVA`,main="FECUNDIDAD RELATIVA", col = "coral")))
+((hist(FDL2E1YC$`FERTILIDAD`,main="FERTILIDAD", col = "coral")))
+```
+
+## Variables relacionadas con la calidad de las ovas.  
+Respecto de la calidad de las ovas, podemos observar que el tamaño de estas, medido por el diámetro de la ova, oscila entre 4-6mm. Asimismo, la mayor frecuencia para el volumen de la ova se encuentra entre los 2-3L. El peso de las ovas, por otro lado, presenta en su mayoría valores de entre los 0.5-1.5kg. Por último, el número de ovas de 30cm oscila mayormente entre las 55-65 ovas.
+```{r}
+par(mfrow=c(2,2))
+((hist(FDL2E1YC$`TAMAÑO OVA`,main="TAMAÑO OVA", col = "seagreen")))
+((hist(FDL2E1YC$`VOLUMEN OVAS`,main="VOLUMEN OVAS", col = "seagreen")))
+((hist(FDL2E1YC$`PESO OVAS`,main="PESO OVAS", col = "seagreen")))
+((hist(FDL2E1YC$`N° OVAS EN 30 CM`,main="N° OVAS EN 30 CM", col = "seagreen")))
+```
+
+## Variables relacionadas con la viabilidad de las ovas.  
+Respecto de la viabilidad de las ovas, un número mínimo de ovas murieron durante los 4 años evaluados, con valores oscilando mayormente entre las 0-1mil ovas muertas. De las ovas sobrevivientes la mayoría fueron seleccionadas para el Programa de Mejora Genética. En cuanto a la producción de ovas, en su mayoría los padres produjeron entre 5-10mil ovas. Por último, respecto de la supervivencia de las ovas, medida con base en la visualización del ojo del embrión, se observa que en su mayoría sobreviven entre el 60-100% de las ovas.
+```{r}
+par(mfrow=c(2,2))
+((hist(FDL2E1YC$`OVAS MUERTAS`,main="OVAS MUERTAS", col = "skyblue")))
+((hist(FDL2E1YC$`OVAS PMG`,main="OVAS PMG", col = "skyblue")))
+((hist(FDL2E1YC$`OVAS PRODUCCIÓN`,main="OVAS PRODUCCIÓN", col = "skyblue")))
+((hist(FDL2E1YC$`PORCENTAJE SOBREVIVENCIA OVA OJO`,main="% SOBREVIVENCIA OVA", col = "skyblue")))
+```
+
+## Variables relacionadas con la supervivencia de alevines.  
+Respecto de la supervivencia de los alevines, se puede observar que la mortalidad, desde la observación de supervivencia de la ova por el ojo del embrión hasta la etapa que este comienza a comer, tiene una baja frecuencia, ya que en los años evaluados solo se observa una mortalidad de entre 0-30 individuos. Por ende, se obtienen, en su mayoría, cada año evaluado, alrededor de 500 individuos sanos y que sobreviven hasta después de la etapa en que comienzan a comer. Por lo que el porcentaje de mortalidad de alevines, es también muy bajo, entre el 0-5%.
+```{r}
+par(mfrow=c(2,2))
+((hist(FDL2E1YC$`MORTALIDAD A SF`,main="MORTALIDAD A SF", col = "salmon1")))
+((hist(FDL2E1YC$`FINAL SF`,main="FINAL SF", col = "salmon1")))
+((hist(FDL2E1YC$`PORCENTAJE MORTALIDAD ALEVINES SF`,main="% MORTALIDAD ALEVINES SF", col = "salmon1")))
+```
+
+
+# Relación entre variables cuantitativas y factores   
+En este punto procederemos a realizar evaluaciones visuales entre las variables y factores de nuestra base de datos.  
+
+# Peso de los padres VS año de evaluación  
+Podemos ver, respecto del peso de los padres, que existe una menor variabilidad en el peso en el año 2019, esto relacionado con que no se observan datos por fuera de la distribución normal observada. Por otro lado, la media para este año es de alrededor de 5kg. La mayor variabilidad se observa en el año 2010, año que corresponde al inicio del PMG y por ende a la población inicial, lo que causa esa variabilidad entre los datos, donde se perciben valores atípicos como individuos con peso de hasta más de 20kg. Aquí resalta que en el año 2016 la media fue superior a la media observada en 2019, sin embargo el peso máximo para el año 2016 no supero los 7kg, pero en 2019 se observa una máxima de 8-8.5kg. Esto es un indicio de que el Programa de Mejora Genética ha permitido incrementar el peso promedio de los padres.
+```{r}
+boxplot(FDL2E1YC$`PESO PADRE`~FDL2E1YC$`CLASE AÑO`, main="Peso padres por año", ylab="Peso (gr)", xlab="Año de evaluación", col="yellowgreen")
+```
+
+# Resumen: Peso de los padres VS año de evaluación   
+```{r}
+PePad10 <- FDL2E1YC %>% filter(`CLASE AÑO` == 2010) %>% summarise("N" = n(), "Promedio"= mean(`PESO PADRE`), "Mediana"= median(`PESO PADRE`), "Min." = min(`PESO PADRE`), "Max." = max(`PESO PADRE`), "DS" = sd(`PESO PADRE`))
+
+PePad13 <- FDL2E1YC %>% filter(`CLASE AÑO` == 2013) %>% summarise("N" = n(), "Promedio"= mean(`PESO PADRE`), "Mediana"= median(`PESO PADRE`), "Min." = min(`PESO PADRE`), "Max." = max(`PESO PADRE`), "DS" = sd(`PESO PADRE`))
+
+PePad16 <- FDL2E1YC %>% filter(`CLASE AÑO` == 2016) %>% summarise("N" = n(), "Promedio"= mean(`PESO PADRE`), "Mediana"= median(`PESO PADRE`), "Min." = min(`PESO PADRE`), "Max." = max(`PESO PADRE`), "DS" = sd(`PESO PADRE`))
+
+PePad19 <- FDL2E1YC %>% filter(`CLASE AÑO` == 2019) %>% summarise("N" = n(), "Promedio"= mean(`PESO PADRE`), "Mediana"= median(`PESO PADRE`), "Min." = min(`PESO PADRE`), "Max." = max(`PESO PADRE`), "DS" = sd(`PESO PADRE`))
+
+knitr::kable(PePad10, caption = "Tabla 7. Resumen de peso de los padres año 2010.")
+knitr::kable(PePad13, caption = "Tabla 8. Resumen de peso de los padres año 2013.")
+knitr::kable(PePad16, caption = "Tabla 9. Resumen de peso de los padres año 2016.")
+knitr::kable(PePad19, caption = "Tabla 10. Resumen de peso de los padres año 2019.")
+
+```
+
+# Peso de las madres VS año de evaluación  
+Al igual que como sucede respecto de los padres, las madres también muestran una menor variabilidad o menor proporción de datos por fuera de la distribución normal, en el año 2019. Vemos además que el peso en las madres se ha mantenido por debajo de los 5kg, sin embargo, respecto de la media, resulta evidente que dicho promedio ha ido aumentando durante los años. Esto indica también que el Programa de Mejora Genética ha permitido incrementar el peso promedio de las madres.
+```{r}
+boxplot(FDL2E1YC$`PESO MADRE`~FDL2E1YC$`CLASE AÑO`, main="Peso madres por año", ylab="Peso (gr)", xlab="Año de evaluación", col="yellowgreen")
+```
+
+# Peso promedio de ambos padres VS año de evaluación   
+Aquí vemos nuevamente la alta variabilidad en los pesos de los padres del año 2010, año de comienzo del PMG. Vemos también como en el año 2019 la media del peso de ambos padres es la mayor de entre los 4 años evaluados, con una distribución entre los 3-7kg, y una media entre los 4.5-5kg.Confirmadose así que el PMG ha permitido el incremento en el peso de los padres, por ende mejorando su crecimiento.
+```{r}
+boxplot(FDL2E1YC$`PESO PROMEDIO PADRES`~FDL2E1YC$`CLASE AÑO`, main="Peso promedio de padres por año", ylab="Peso Promedio (gr)", xlab="Año de evaluación", col="yellowgreen")
 ```
 
